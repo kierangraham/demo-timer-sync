@@ -6,12 +6,21 @@
 <script src="socket.io/socket.io.js"></script>
 <script>
 
+  // beats per second per ms
+  var BPM = (60.0 / 100).toFixed(2) * 1000.0;
+  var bar = 1;
+
   $(function() {
     var start = null;
     var timer = null;
     var clock = function(){
       var interval = new Date - start;
-      $("#timer").text((interval / 1000).toFixed(2));
+      $("#timer").text(bar++);
+      $("#beat").show();
+
+      setTimeout(function() {
+        $("#beat").fadeOut(BPM / 3);
+      }, 0)
       // $("#timer").text(now.getHour() + ":" + now.getMinutes() + ":" + now.getSeconds() + ":" + now.getMilliseconds());
     };
 
@@ -19,7 +28,7 @@
     socket.on("clock:tick", function(data){
       // console.log("clock:tick from " + data);
       start = new Date();
-      timer = setInterval(clock, 10);
+      timer = setInterval(clock, BPM);
     });
 
     socket.on("clock:stop", function(data) {
@@ -42,13 +51,12 @@
   });
 </script>
 
-<div style="text-align:center;padding:10px;color:#4b4b4b;font-size:64px;">
-  <h1 id="timer">0.00</h1>
-
-
+<div style="text-align:center;padding:10px;color:#4b4b4b;font-size:3em;">
   <div id="controls" style="display:none;">
     <button id="start">Start</button>
     <button id="stop">Stop</button>
   </div>
 
+  <h1 id="timer">0.00</h1>
+  <h1 id="beat" style="color:white;display:none;background:#1b1b1b;">BEAT</h1>
 </div>
