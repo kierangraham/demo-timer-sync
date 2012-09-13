@@ -8,7 +8,8 @@
 
   // beats per second per ms
   var BPM = (60.0 / 100).toFixed(2) * 1000.0;
-  var bar = 1;
+  var start_bar = 1;
+  var bar = start_bar;
 
   $(function() {
     var start = null;
@@ -34,6 +35,11 @@
     socket.on("clock:stop", function(data) {
       // console.log("clock:stop at " + data);
       clearInterval(timer);
+      bar = start_bar;
+    });
+
+    socket.on("refresh", function(data){
+      window.location.reload();
     });
 
     // show start/stop
@@ -48,6 +54,11 @@
 
       socket.emit('clock:'+which, null);
     });
+
+    // refresh all clients
+    $("#refresh").click(function(e){
+      socket.emit('refresh', null);
+    });
   });
 </script>
 
@@ -55,8 +66,9 @@
   <div id="controls" style="display:none;">
     <button id="start">Start</button>
     <button id="stop">Stop</button>
+    <button id="refresh">Refresh All Clients</button>
   </div>
 
-  <h1 id="timer">0.00</h1>
+  <h1 id="timer">0</h1>
   <h1 id="beat" style="color:white;display:none;background:#1b1b1b;">BEAT</h1>
 </div>

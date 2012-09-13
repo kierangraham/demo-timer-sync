@@ -27,4 +27,8 @@ io.sockets.on('connection', function (socket) {
   socket.on('clock:stop', function(data) {
     io.sockets.emit("clock:stop", new Date());
   });
+
+  socket.on('refresh', function(data){
+    io.sockets.emit("refresh", null);
+  });
 });
