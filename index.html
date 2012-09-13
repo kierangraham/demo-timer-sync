@@ -20,8 +20,8 @@
       $("#beat").show();
 
       setTimeout(function() {
-        $("#beat").fadeOut(BPM / 3);
-      }, 0)
+        $("#beat").hide();
+      }, 50);
       // $("#timer").text(now.getHour() + ":" + now.getMinutes() + ":" + now.getSeconds() + ":" + now.getMilliseconds());
     };
 
@@ -39,7 +39,10 @@
     });
 
     socket.on("refresh", function(data){
-      window.location.reload();
+      $("#beat").text("Refreshing...").show();
+      setTimeout(function() {
+        window.location.reload();
+      }, 250);
     });
 
     // show start/stop
