@@ -6,35 +6,49 @@
 <script src="socket.io/socket.io.js"></script>
 <script>
 
-  // beats per second per ms
-  var BPM = (60.0 / 100).toFixed(2) * 1000.0;
+  // (seconds / BPM) in ms
+  var BPM = ((60.0 / 120)).toFixed(4) * 1000.0;
   var start_bar = 1;
   var bar = start_bar;
+  var tick = false;
 
   $(function() {
     var start = null;
     var timer = null;
     var clock = function(){
-      var interval = new Date - start;
       $("#timer").text(bar++);
       $("#beat").show();
 
       setTimeout(function() {
         $("#beat").hide();
       }, 50);
+
       // $("#timer").text(now.getHour() + ":" + now.getMinutes() + ":" + now.getSeconds() + ":" + now.getMilliseconds());
+    };
+    var ticker = function(){
+      if (tick){
+        clock();
+        setTimeout(ticker, BPM);
+      }
     };
 
     var socket = io.connect(window.location.origin);
     socket.on("clock:tick", function(data){
-      // console.log("clock:tick from " + data);
       start = new Date();
-      timer = setInterval(clock, BPM);
+      tick  = true;
+      timer = ticker();
+
+      console.log("clock:tick from " + data);
+
+      var delta = new Date(data) - start;
+      $("#client_time").text(start);
+      $("#server_time").text(new Date(data));
+      $("#time_delta").text(delta);
     });
 
     socket.on("clock:stop", function(data) {
       // console.log("clock:stop at " + data);
-      clearInterval(timer);
+      tick = false;
       bar = start_bar;
     });
 
@@ -64,6 +78,14 @@
     });
   });
 </script>
+
+<pre>
+DEBUG INFO
+---
+Client Time         <strong id="client_time">null</strong>
+Server Time         <strong id="server_time">null</strong>
+Time Delta          <strong id="time_delta">null</strong>
+</pre>
 
 <div style="text-align:center;padding:10px;color:#4b4b4b;font-size:3em;">
   <div id="controls" style="display:none;">
