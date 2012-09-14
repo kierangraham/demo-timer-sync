@@ -6,23 +6,31 @@
 <script src="socket.io/socket.io.js"></script>
 <script>
 
-  // beats per second per ms
-  var BPM = (60.0 / 100).toFixed(2) * 1000.0;
-  var start_bar = 1;
+  // beats per second per beats in bar per ms
+  var per_bar = 4;
+  var BPM = (60.0 / (120.0 * 2)).toFixed(2) * 1000.0;
+  var start_bar = 0;
   var bar = start_bar;
 
   $(function() {
     var start = null;
     var timer = null;
     var clock = function(){
-      var interval = new Date - start;
-      $("#timer").text(bar++);
+      $("#timer").text(bar+1);
+      if (bar % per_bar == 0) {
+        $("#beat").text("BAR");
+      }
+      else {
+        $("#beat").text(bar % per_bar+1);
+      }
       $("#beat").show();
 
       setTimeout(function() {
-        $("#beat").hide();
-      }, 50);
-      // $("#timer").text(now.getHour() + ":" + now.getMinutes() + ":" + now.getSeconds() + ":" + now.getMilliseconds());
+        // $("#beat").hide();
+      }, 150);
+      // $("#timer")
+
+      bar++;
     };
 
     var socket = io.connect(window.location.origin);
@@ -30,6 +38,13 @@
       // console.log("clock:tick from " + data);
       start = new Date();
       timer = setInterval(clock, BPM);
+
+      console.log("clock:tick from " + data);
+
+      var delta = new Date(data) - start;
+      $("#client_time").text(start);
+      $("#server_time").text(new Date(data));
+      $("#time_delta").text(delta);
     });
 
     socket.on("clock:stop", function(data) {
@@ -42,7 +57,7 @@
       $("#beat").text("Refreshing...").show();
       setTimeout(function() {
         window.location.reload();
-      }, 250);
+      }, 500);
     });
 
     // show start/stop
@@ -65,6 +80,16 @@
   });
 </script>
 
+<pre>
+    DEBUG INFO
+    ---
+    Client Time         <strong id="client_time">null</strong>
+    Server Time         <strong id="server_time">null</strong>
+    Time Delta          <strong id="time_delta">null</strong>
+    Raw Timer           <strong id="timer">0</strong>
+</pre>
+
+
 <div style="text-align:center;padding:10px;color:#4b4b4b;font-size:3em;">
   <div id="controls" style="display:none;">
     <button id="start">Start</button>
@@ -72,6 +97,6 @@
     <button id="refresh">Refresh All Clients</button>
   </div>
 
-  <h1 id="timer">0</h1>
-  <h1 id="beat" style="color:white;display:none;background:#1b1b1b;">BEAT</h1>
+
+  <h1 id="beat" style="color:#1e1e1e;display:none;">BEAT</h1>
 </div>
