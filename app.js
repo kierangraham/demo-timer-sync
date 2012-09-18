@@ -19,21 +19,23 @@ function handler (req, res) {
 
 io.configure(function () {
   io.set("transports", ["xhr-polling"]);
-  io.set("polling duration", 10);
+  io.set("polling duration", 60);
 });
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('connection', { connect: 'ok' });
-
-  socket.on('clock:start', function(data){
-    io.sockets.emit("clock:tick", new Date());
+  // clock:start
+  socket.on('S', function(data){
+    // clock:tick
+    io.sockets.emit("T", new Date());
   });
 
-  socket.on('clock:stop', function(data) {
-    io.sockets.emit("clock:stop", new Date());
+  // clock:stop
+  socket.on('P', function(data) {
+    io.sockets.emit("P", new Date());
   });
 
-  socket.on('refresh', function(data){
-    io.sockets.emit("refresh", null);
+  // refresh
+  socket.on('R', function(data){
+    io.sockets.emit("R", null);
   });
 });

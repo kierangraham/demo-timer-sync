@@ -27,14 +27,14 @@
 
       setTimeout(function() {
         // $("#beat").hide();
-      }, 150);
+      }, BPM / 2);
       // $("#timer")
 
       bar++;
     };
 
     var socket = io.connect(window.location.origin);
-    socket.on("clock:tick", function(data){
+    socket.on("T", function(data){
       // console.log("clock:tick from " + data);
       start = new Date();
       timer = setInterval(clock, BPM);
@@ -47,13 +47,13 @@
       $("#time_delta").text(delta);
     });
 
-    socket.on("clock:stop", function(data) {
+    socket.on("P", function(data) {
       // console.log("clock:stop at " + data);
       clearInterval(timer);
       bar = start_bar;
     });
 
-    socket.on("refresh", function(data){
+    socket.on("R", function(data){
       $("#beat").text("Refreshing...").show();
       setTimeout(function() {
         window.location.reload();
@@ -70,12 +70,15 @@
       var button = e.currentTarget;
       var which  = $(button).text().toLowerCase();
 
-      socket.emit('clock:'+which, null);
+      // clock:start / clock:stop
+      var action = which == "start" ? "S" : "P";
+
+      socket.emit(action, null);
     });
 
     // refresh all clients
     $("#refresh").click(function(e){
-      socket.emit('refresh', null);
+      socket.emit('R', null);
     });
   });
 </script>
